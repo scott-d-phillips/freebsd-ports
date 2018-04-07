@@ -29,7 +29,7 @@ CMAKE_ARGS=	-DFFMPEG_SUFFIX:STRING="${FFMPEG_SUFX}"
 # Keep in sync with multimedia/mlt, possibly.
 FFMPEG_SUFX=	# Currently empty.
 
-OPTIONS_DEFINE=	DVDWIZARD FREI0R LADSPA SCREENCAST V4L XINE
+OPTIONS_DEFINE=	DVDWIZARD FREI0R LADSPA SCREENCAST V4L XINE JOGSHUTTLE
 OPTIONS_DEFAULT=DVDWIZARD FREI0R LADSPA SCREENCAST V4L XINE
 OPTIONS_SUB=	yes
 
@@ -37,6 +37,7 @@ DVDWIZARD_DESC=	DVD authoring via DVDAuthor and cdrtools
 SCREENCAST_DESC=Screen capture support via recordMyDesktop
 V4L_DESC=	Webcam support via Video4Linux
 XINE_DESC=	DVD preview support via xine
+JOGSHUTTLE_DESC=Jog/Shuttle support
 
 DVDWIZARD_RUN_DEPENDS=	dvdauthor:multimedia/dvdauthor \
 			cdrecord:sysutils/cdrtools
@@ -52,9 +53,18 @@ V4L_CMAKE_OFF=		-DWITH_LibV4L2:BOOL=FALSE
 
 XINE_RUN_DEPENDS=	xine:multimedia/xine
  
+# XXX: webcamd Jog/Shuttle support is not tested
+JOGSHUTTLE_BUILD_DEPENDS=	${LOCALBASE}/include/linux/input.h:devel/evdev-proto
+JOGSHUTTLE_RUN_DEPENDS=	webcamd:multimedia/webcamd
+JOGSHUTTLE_CMAKE_OFF=	-DWITH_JogShuttle:BOOL=FALSE
+
 post-patch:
 	@${REINPLACE_CMD} -e '/^update_xdg_mimetypes/ d' \
 		-e '/SharedMimeInfo/ d' \
 		${PATCH_WRKSRC}/data/CMakeLists.txt
+
+post-patch-JOGSHUTTLE-on:
+	@${REINPLACE_CMD} -e '/#include <asm\/types\.h>/d' \
+		${WRKSRC}/src/lib/external/media_ctrl/mediactrl.c
 
 .include <bsd.port.mk>
