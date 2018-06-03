@@ -1,0 +1,28 @@
+--- meson.build.orig	2018-05-13 18:18:07 UTC
++++ meson.build
+@@ -9,6 +9,8 @@ project(
+ 	],
+ )
+ 
++add_project_arguments('-Wno-deprecated-declarations', language: 'c')
++add_project_arguments('-Wno-unused-variable', language: 'c')
+ add_project_arguments('-Wno-unused-parameter', language: 'c')
+ add_project_arguments('-Wno-unused-function', language: 'c')
+ add_project_arguments('-Wno-unused-result', language: 'c')
+@@ -16,6 +18,7 @@ add_project_arguments('-Wno-unused-result', language: 
+ cc = meson.get_compiler('c')
+ 
+ is_freebsd = host_machine.system().startswith('freebsd')
++is_linux = host_machine.system().startswith('linux')
+ datadir = get_option('datadir')
+ sysconfdir = get_option('sysconfdir')
+ prefix = get_option('prefix')
+@@ -36,7 +39,7 @@ pango          = dependency('pango')
+ pangocairo     = dependency('pangocairo')
+ gdk_pixbuf     = dependency('gdk-pixbuf-2.0', required: false)
+ pixman         = dependency('pixman-1')
+-libcap         = dependency('libcap')
++libcap         = dependency('libcap', required: is_linux)
+ libinput       = dependency('libinput', version: '>=1.6.0')
+ libpam         = cc.find_library('pam')
+ systemd        = dependency('libsystemd', required: false)
